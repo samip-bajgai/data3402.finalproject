@@ -1,0 +1,16 @@
+# Ignoring downloaded datasets
+*.csv
+
+# Ignoring Python cache files
+__pycache__/
+*.pyc
+
+# Ignoring Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Ignoring Mac system files
+.DS_Store
+
+# Ignoring virtual environment folders
+.venv/
+venv/
