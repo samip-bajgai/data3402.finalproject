@@ -6,11 +6,11 @@
 
 ## Overview
 
-The task is to classify mushrooms as edible or poisonous based on physical mushroom features. The dataset comes from the Kaggle Mushroom Classification dataset.
+This project uses the Mushroom Classification dataset from Kaggle. The goal is to predict whether a mushroom is edible or poisonous from its physical features.
 
-This project treats the task as a binary classification problem. I inspected the data, checked for missing and unusual values, visualized important categorical features, cleaned the data, one-hot encoded the categorical columns, trained classification models, and compared their performance.
+The dataset is a good fit for a tabular classification project because every row is one mushroom and every column is a feature. Most of the work was cleaning the categorical data, checking the unusual `?` values, encoding the columns, and comparing a few basic classification models.
 
-The best models reached perfect validation and testing performance. Since perfect accuracy can look suspicious, I also checked for target leakage and row overlap between the training, validation, and testing samples.
+The models got perfect validation and test accuracy. That looked suspicious at first, so I checked for target leakage and row overlap. I did not find either one. The result seems to come from the dataset being very clean and easy to separate.
 
 ## Summary of Workdone
 
@@ -42,19 +42,19 @@ All feature columns were categorical, so I used one-hot encoding to convert them
 
 #### Data Visualization
 
-I made several simple visualizations to understand the data before modeling.
+I used a few bar plots and tables to check how the target class relates to the features.
 
-The class distribution showed that the dataset was close to balanced. About 51.8% of the mushrooms were edible, and about 48.2% were poisonous.
+The class column is almost balanced. About 51.8% of the mushrooms are edible, and about 48.2% are poisonous.
 
-I also compared several categorical features against the target class. Odor showed a strong relationship with mushroom class. Some odor categories were mostly edible, while others were mostly poisonous. Gill size and habitat also showed useful patterns.
+Odor stood out the most. Some odor categories were basically all edible or all poisonous. Gill size and habitat also showed useful differences between the two classes.
 
-I also plotted the number of unique values in each column. This helped identify that `veil-type` had only one unique value, so I removed it before modeling.
+I also checked how many unique values each column had. That showed that `veil-type` only had one value, so I removed it before modeling.
 
 ### Problem Formulation
 
 * Input:
-  * One-hot encoded mushroom features.
-  * These features describe physical traits such as cap shape, cap color, odor, gill size, stalk features, population, and habitat.
+  * Mushroom features after one-hot encoding.
+  * Examples include cap shape, cap color, odor, gill size, stalk features, population, and habitat.
 
 * Output:
   * Mushroom class.
@@ -67,17 +67,17 @@ I also plotted the number of unique values in each column. This helped identify 
   * Decision Tree
   * Random Forest
 
-I coded poisonous mushrooms as the positive class because identifying poisonous mushrooms correctly is more important than identifying edible mushrooms correctly.
+I used poisonous mushrooms as the positive class. In this problem, missing a poisonous mushroom matters more than warning too much about an edible one.
 
 ### Training
 
-The models were trained using scikit-learn in a local Python environment.
+I trained the models with scikit-learn on my local machine.
 
-The data was split into training, validation, and testing samples. The training sample was used to fit the models. The validation sample was used to compare model performance. The testing sample was kept separate for final evaluation.
+I split the data into training, validation, and test sets. The training set was used to fit the models. The validation set was used to compare them. The test set was saved until the end.
 
-I used `random_state=42` to make the split and models reproducible. I also used stratified splitting so that the class balance stayed similar across the training, validation, and testing samples.
+I used `random_state=42` so the results would be repeatable. I also used stratified splitting so the edible and poisonous classes stayed balanced in each split.
 
-I did not use deep learning for this project because the dataset is tabular, categorical, and small enough for standard scikit-learn classification models.
+I did not use deep learning. This dataset is small, categorical, and tabular, so regular scikit-learn models made more sense.
 
 ### Performance Comparison
 
@@ -116,19 +116,19 @@ Because perfect accuracy can look suspicious, I checked for target leakage and r
 
 ### Conclusions
 
-The Mushroom Classification dataset is clean, categorical, and highly separable. The trained models were able to classify edible and poisonous mushrooms perfectly on both the validation and testing samples.
+The mushroom dataset was much easier to classify than I expected. The trained models all separated edible and poisonous mushrooms perfectly on the validation set, and Random Forest also got perfect results on the test set.
 
-The main data issue was the `?` values in the `stalk-root` column. Treating those values as a `missing` category allowed the project to keep all rows instead of dropping a large part of the dataset.
+The biggest data issue was the `?` values in `stalk-root`. I kept those rows and changed `?` into a `missing` category instead of dropping them.
 
-The high performance should still be interpreted carefully. This result does not mean that the same model would always perform perfectly on new mushroom data collected in the real world. It mostly shows that this dataset contains strong patterns that separate edible and poisonous mushrooms.
+The perfect score should still be taken carefully. This does not mean the model would be perfect on every real mushroom dataset. It means this specific dataset has very strong patterns, especially in features like odor.
 
 ### Future Work
 
-Future work could include trying the model on a newer or messier mushroom dataset to see whether the performance stays high.
+A useful next step would be to test the model on a messier mushroom dataset.
 
-Another useful next step would be to compare performance after removing very strong features such as odor. This would test how much the model depends on a few highly predictive features.
+I would also try removing odor and training the models again. Odor seems very strong, so this would show how much the model depends on that one feature.
 
-A smaller model using only the most important features could also make the result easier to explain.
+Another option would be to build a smaller model using only the most important features. That would make the result easier to explain.
 
 ## How to reproduce results
 
