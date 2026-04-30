@@ -1,121 +1,202 @@
 ![](UTA-DataScience-Logo.png)
 
-# Project Title
+# Mushroom Classification Project
 
-* **One Sentence Summary** Ex: This repository holds an attempt to apply LSTMs to Stock Market using data from
-"Get Rich" Kaggle challenge (provide link). 
+* **One Sentence Summary:** This repository uses the Mushroom Classification dataset from Kaggle to predict whether a mushroom is edible or poisonous using tabular machine learning models.
 
 ## Overview
 
-* This section could contain a short paragraph which include the following:
-  * **Definition of the tasks / challenge**  Ex: The task, as defined by the Kaggle challenge is to use a time series of 12 features, sampled daily for 1 month, to predict the next day's price of a stock.
-  * **Your approach** Ex: The approach in this repository formulates the problem as regression task, using deep recurrent neural networks as the model with the full time series of features as input. We compared the performance of 3 different network architectures.
-  * **Summary of the performance achieved** Ex: Our best model was able to predict the next day stock price within 23%, 90% of the time. At the time of writing, the best performance on Kaggle of this metric is 18%.
+The task is to classify mushrooms as edible or poisonous based on physical mushroom features. The dataset comes from the Kaggle Mushroom Classification dataset.
+
+This project treats the task as a binary classification problem. I inspected the data, checked for missing and unusual values, visualized important categorical features, cleaned the data, one-hot encoded the categorical columns, trained classification models, and compared their performance.
+
+The best models reached perfect validation and testing performance. Since perfect accuracy can look suspicious, I also checked for target leakage and row overlap between the training, validation, and testing samples.
 
 ## Summary of Workdone
-
-Include only the sections that are relevant an appropriate.
 
 ### Data
 
 * Data:
-  * Type: For example
-    * Input: medical images (1000x1000 pixel jpegs), CSV file: image filename -> diagnosis
-    * Input: CSV file of features, output: signal/background flag in 1st column.
-  * Size: How much data?
-  * Instances (Train, Test, Validation Split): how many data points? Ex: 1000 patients for training, 200 for testing, none for validation
+  * Type: CSV file with categorical mushroom features.
+  * Input: mushroom physical features such as cap shape, cap color, odor, gill size, stalk features, population, and habitat.
+  * Output: mushroom class.
+    * `e` = edible
+    * `p` = poisonous
+  * Size: 8124 rows and 23 original columns.
+  * Instances:
+    * Training: 4874 rows
+    * Validation: 1625 rows
+    * Testing: 1625 rows
+
+The dataset does not include a separate official Kaggle test file. Because of that, I created my own training, validation, and testing splits from the available CSV file.
 
 #### Preprocessing / Clean up
 
-* Describe any manipulations you performed to the data.
+The dataset did not contain regular missing values according to `df.isnull().sum()`. However, the `stalk-root` column contained 2480 question mark values.
+
+These question marks were treated as an unknown category. I replaced `?` with `missing` instead of dropping the rows because removing 2480 rows would remove a large part of the dataset.
+
+I also removed the `veil-type` column because it had only one unique value. Since every row had the same value for this column, it did not help separate edible mushrooms from poisonous mushrooms.
+
+All feature columns were categorical, so I used one-hot encoding to convert them into numeric 0/1 columns. After encoding, the feature matrix had 116 columns.
 
 #### Data Visualization
 
-Show a few visualization of the data and say a few words about what you see.
+I made several simple visualizations to understand the data before modeling.
+
+The class distribution showed that the dataset was close to balanced. About 51.8% of the mushrooms were edible, and about 48.2% were poisonous.
+
+I also compared several categorical features against the target class. Odor showed a strong relationship with mushroom class. Some odor categories were mostly edible, while others were mostly poisonous. Gill size and habitat also showed useful patterns.
+
+I also plotted the number of unique values in each column. This helped identify that `veil-type` had only one unique value, so I removed it before modeling.
 
 ### Problem Formulation
 
-* Define:
-  * Input / Output
-  * Models
-    * Describe the different models you tried and why.
-  * Loss, Optimizer, other Hyperparameters.
+* Input:
+  * One-hot encoded mushroom features.
+  * These features describe physical traits such as cap shape, cap color, odor, gill size, stalk features, population, and habitat.
+
+* Output:
+  * Mushroom class.
+  * `0` = edible
+  * `1` = poisonous
+
+* Models:
+  * Majority-class baseline
+  * Logistic Regression
+  * Decision Tree
+  * Random Forest
+
+I coded poisonous mushrooms as the positive class because identifying poisonous mushrooms correctly is more important than identifying edible mushrooms correctly.
 
 ### Training
 
-* Describe the training:
-  * How you trained: software and hardware.
-  * How did training take.
-  * Training curves (loss vs epoch for test/train).
-  * How did you decide to stop training.
-  * Any difficulties? How did you resolve them?
+The models were trained using scikit-learn in a local Python environment.
+
+The data was split into training, validation, and testing samples. The training sample was used to fit the models. The validation sample was used to compare model performance. The testing sample was kept separate for final evaluation.
+
+I used `random_state=42` to make the split and models reproducible. I also used stratified splitting so that the class balance stayed similar across the training, validation, and testing samples.
+
+I did not use deep learning for this project because the dataset is tabular, categorical, and small enough for standard scikit-learn classification models.
 
 ### Performance Comparison
 
-* Clearly define the key performance metric(s).
-* Show/compare results in one table.
-* Show one (or few) visualization(s) of results, for example ROC curves.
+The main metrics were accuracy, precision, recall, and F1 score.
+
+Recall is important in this project because missing a poisonous mushroom would be more serious than incorrectly warning about an edible mushroom.
+
+Validation results:
+
+| Model | Accuracy | Precision | Recall | F1 Score |
+|---|---:|---:|---:|---:|
+| Majority Class Baseline | 0.518154 | 0.000000 | 0.000000 | 0.000000 |
+| Logistic Regression | 1.000000 | 1.000000 | 1.000000 | 1.000000 |
+| Decision Tree | 1.000000 | 1.000000 | 1.000000 | 1.000000 |
+| Random Forest | 1.000000 | 1.000000 | 1.000000 | 1.000000 |
+
+The majority-class baseline performed much worse than the trained models. This shows that the perfect model performance was not caused by class imbalance.
+
+Final testing results for Random Forest:
+
+| Metric | Result |
+|---|---:|
+| Accuracy | 1.000000 |
+| Precision | 1.000000 |
+| Recall | 1.000000 |
+| F1 Score | 1.000000 |
+
+Testing confusion matrix:
+
+|  | Predicted Edible | Predicted Poisonous |
+|---|---:|---:|
+| Actual Edible | 842 | 0 |
+| Actual Poisonous | 0 | 783 |
+
+Because perfect accuracy can look suspicious, I checked for target leakage and row overlap. The target column was not included in the encoded features, and there was no overlap between the training, validation, and testing rows.
 
 ### Conclusions
 
-* State any conclusions you can infer from your work. Example: LSTM work better than GRU.
+The Mushroom Classification dataset is clean, categorical, and highly separable. The trained models were able to classify edible and poisonous mushrooms perfectly on both the validation and testing samples.
+
+The main data issue was the `?` values in the `stalk-root` column. Treating those values as a `missing` category allowed the project to keep all rows instead of dropping a large part of the dataset.
+
+The high performance should still be interpreted carefully. This result does not mean that the same model would always perform perfectly on new mushroom data collected in the real world. It mostly shows that this dataset contains strong patterns that separate edible and poisonous mushrooms.
 
 ### Future Work
 
-* What would be the next thing that you would try.
-* What are some other studies that can be done starting from here.
+Future work could include trying the model on a newer or messier mushroom dataset to see whether the performance stays high.
+
+Another useful next step would be to compare performance after removing very strong features such as odor. This would test how much the model depends on a few highly predictive features.
+
+A smaller model using only the most important features could also make the result easier to explain.
 
 ## How to reproduce results
 
-* In this section, provide instructions at least one of the following:
-   * Reproduce your results fully, including training.
-   * Apply this package to other data. For example, how to use the model you trained.
-   * Use this package to perform their own study.
-* Also describe what resources to use for this package, if appropirate. For example, point them to Collab and TPUs.
-
 ### Overview of files in repository
 
-* Describe the directory structure, if any.
-* List all relavent files and describe their role in the package.
-* An example:
-  * utils.py: various functions that are used in cleaning and visualizing data.
-  * preprocess.ipynb: Takes input data in CSV and writes out data frame after cleanup.
-  * visualization.ipynb: Creates various visualizations of the data.
-  * models.py: Contains functions that build the various models.
-  * training-model-1.ipynb: Trains the first model and saves model during training.
-  * training-model-2.ipynb: Trains the second model and saves model during training.
-  * training-model-3.ipynb: Trains the third model and saves model during training.
-  * performance.ipynb: loads multiple trained models and compares results.
-  * inference.ipynb: loads a trained model and applies it to test data to create kaggle submission.
-
-* Note that all of these notebooks should contain enough text for someone to understand what is happening.
+* `README.md`: project report and summary.
+* `requirements.txt`: Python packages used in the project.
+* `notebooks/mushroom_classification_project.ipynb`: main notebook containing data loading, inspection, visualization, preprocessing, modeling, evaluation, and conclusion.
+* `UTA-DataScience-Logo.png`: logo image used at the top of the README.
 
 ### Software Setup
-* List all of the required packages.
-* If not standard, provide or point to instruction for installing the packages.
-* Describe how to install your package.
+
+This project uses Python with the following main packages:
+
+* pandas
+* numpy
+* matplotlib
+* scikit-learn
+* kagglehub
+* jupyter
+* ipykernel
+
+To set up the environment, run:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
 ### Data
 
-* Point to where they can download the data.
-* Lead them through preprocessing steps, if necessary.
+The dataset is downloaded inside the notebook using KaggleHub:
+
+```python
+import kagglehub
+
+path = kagglehub.dataset_download("uciml/mushroom-classification")
+```
+
+The original CSV file is not included in this repository. It can be downloaded from Kaggle:
+
+https://www.kaggle.com/datasets/uciml/mushroom-classification
 
 ### Training
 
-* Describe how to train the model
+Open and run the notebook:
+
+```text
+notebooks/mushroom_classification_project.ipynb
+```
+
+Run all cells from top to bottom. The notebook downloads the data, preprocesses it, trains the models, and evaluates performance.
 
 #### Performance Evaluation
 
-* Describe how to run the performance evaluation.
+The notebook evaluates the models using:
 
+* Accuracy
+* Precision
+* Recall
+* F1 score
+* Classification report
+* Confusion matrix
+
+The Random Forest model is used for the final held-out testing evaluation.
 
 ## Citations
 
-* Provide any references.
-
-
-
-
-
-
-
+* Kaggle. Mushroom Classification Dataset. https://www.kaggle.com/datasets/uciml/mushroom-classification
+* UCI Machine Learning Repository. Mushroom Data Set.
