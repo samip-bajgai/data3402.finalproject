@@ -48,10 +48,6 @@ The class column is almost balanced. About 51.8% of the mushrooms are edible, an
 
 Odor stood out the most. Some odor categories were basically all edible or all poisonous. Gill size and habitat also showed useful differences between the two classes.
 
-![Class Distribution](images/class_distribution.png)
-
-![Odor by Mushroom Class](images/odor_by_class.png)
-
 I also checked how many unique values each column had. That showed that `veil-type` only had one value, so I removed it before modeling.
 
 ### Problem Formulation
@@ -98,8 +94,6 @@ Validation results:
 | Decision Tree | 1.000000 | 1.000000 | 1.000000 | 1.000000 |
 | Random Forest | 1.000000 | 1.000000 | 1.000000 | 1.000000 |
 
-![Validation Accuracy by Model](images/validation_accuracy.png)
-
 The majority-class baseline performed much worse than the trained models. This shows that the perfect model performance was not caused by class imbalance.
 
 Final testing results for Random Forest:
@@ -117,8 +111,6 @@ Testing confusion matrix:
 |---|---:|---:|
 | Actual Edible | 842 | 0 |
 | Actual Poisonous | 0 | 783 |
-
-![Random Forest Testing Confusion Matrix](images/testing_confusion_matrix.png)
 
 Because perfect accuracy can look suspicious, I checked for target leakage and row overlap. The target column was not included in the encoded features, and there was no overlap between the training, validation, and testing rows.
 
